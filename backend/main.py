@@ -23,3 +23,9 @@ sql_room = execute_read_query(conn,room)
 resident = "SELECT * FROM resident"
 sql_resident = execute_read_query(conn,resident)
 
+@app.route('/api/floor', methods = 'GET')
+def return_floor():
+    return sql_floor
+
+
+app.run()
