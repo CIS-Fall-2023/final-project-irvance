@@ -14,27 +14,69 @@ app.config["DEBUG"] = True # allows errors to show in browser
 myCreds = creds.Creds()
 conn = create_connection(myCreds.host, myCreds.user, myCreds.password, myCreds.database)
 
-floor= "SELECT * FROM floor"
-sql_floor = execute_read_query(conn,floor)
+# masterUsername = 
+# masterPassword = 
 
-room = "SELECT * FROM room"
-sql_room = execute_read_query(conn,room)
+sql_floor= "SELECT * FROM floor"
+floors = execute_read_query(conn,sql_floor)
 
-resident = "SELECT * FROM resident"
-sql_resident = execute_read_query(conn,resident)
+sql_room = "SELECT * FROM room"
+rooms = execute_read_query(conn,sql_room)
+
+sql_resident = "SELECT * FROM resident"
+residents = execute_read_query(conn,sql_resident)
+
+# # token authentication
+# @app.route('/login', methods = ['GET'])
+# def auth_test():
+#     if request.authorization:
+#         encoded = request.authorization.password.encode #unicode encoding
+#         hashedResult = hashlib.sha256(encoded) #hashing
+#         if request.authorization.username == masterUsername and hashedResult.hexdigest() == masterPassword:
+#             return '<h1> Authorized user access </h1>'
+#     return make_response('Could not verify.', 401, {'WWW-Authenticate': 'Basic realm = "Login required."'})
+
+
+# Welcome page
+@app.route('/home', methods = ['GET'])
+def welcome_page():
+    return '<h1> Home page </h1>'
+
 
 # Floor APIs
-@app.route('/api/floor', methods = ['GET'])
+@app.route('/api/floors', methods = ['GET'])
 def return_floor():
-    return sql_floor
+    return floors
+
+# @app.route('/api/floor/addentry', methods=['POST'])
+# def new_floor():
+    
+
+
+
 
 # Room APIs
-@app.route('/api/room', methods = ['GET'])
-def return_floor():
-    return sql_room
+@app.route('/api/rooms', methods = ['GET'])
+def return_room():
+    return rooms
+
+
+
+
+
 
 # Resident APIs
-@app.route('/api/resident', methods = ['GET'])
-def return_floor():
-    return sql_resident
+@app.route('/api/residents', methods = ['GET'])
+def return_resident():
+    return residents
+
+
+
+
+
+
 app.run()
+
+
+# References
+# https://dev.mysql.com/doc/mysql-tutorial-excerpt/8.0/en/example-foreign-keys.html
