@@ -48,10 +48,28 @@ def welcome_page():
 def return_floor():
     return floors
 
-# @app.route('/api/floor/addentry', methods=['POST'])
-# def new_floor():
-    
+@app.route('/api/floors/add', methods = ['POST'])
+def add_floor():
+    req_data = request.get_json() # json request for postman
+    new_level = req_data.get('level')
+    new_name =  req_data.get('name')
 
+    sql_insert = """INSERT INTO floor (level, name) VALUES ('%s', '%s')""" % (new_level, new_name)
+    execute_query(conn, sql_insert)
+    return "New floor added."
+
+# PUT: updates floor name
+@app.route('/api/floors/update', methods=['PUT']) # id to change in address; syntax: http://127.0.0.1:5000/api/floors/update?id=<idtochange>
+def update_floors():
+    if 'id' in request.args:
+        id = int(request.args['id'])
+    else:
+        return "Error. No id provided."
+    req_data = request.get_json()
+    update_column = req_data.get('name') # prompts user in postman to update floor name
+    update_name = "UPDATE floor SET name = '%s' WHERE id = %s" % (update_column, id)
+    execute_query(conn, update_name)
+    return "Floor name updated."
 
 
 
