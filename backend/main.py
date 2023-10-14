@@ -86,7 +86,8 @@ def delete_floors():
         return "Floor data removed from table."
     
 
-# ---------------------------------------------------
+
+
 # Room APIs
 @app.route('/api/rooms', methods = ['GET'])
 def return_room():
@@ -115,16 +116,38 @@ def update_rooms():
     execute_query(conn, update_capacity)
     return "Room capacity updated."
 
-# @app.route('/api/rooms/delete', methods = ['DELETE'])
-# def delete_rooms():
-    
+@app.route('/api/rooms/delete', methods = ['DELETE'])
+def delete_rooms():
+    if 'id' in request.args:
+        id = int(request.args['id'])
+    else:
+        return "Error. No ID provided."
+    idToDelete = id
+    for i in range(len(rooms)-1, -1, -1):
+        if rooms[i]['id'] == idToDelete:
+            delete_query = "DELETE FROM room WHERE id = %s" % (id)
+            execute_query(conn, delete_query)
+        return "Room data removed from table."
+
+
+
 
 # # Resident APIs
 @app.route('/api/residents', methods = ['GET'])
 def return_resident():
     return residents
 
-
+@app.route('/api/residents/add', methods = ['POST'])
+def add_resident():
+    req_data = request.get_json() # json request for postman
+    new_firstname = req_data.get('firstname')
+    new_lastname =  req_data.get('lastname')
+    new_age = req_data.get('age')
+    new_room = req_data.get('room')
+    
+    sql_insert = """INSERT INTO resident (firstname, lastname, age, room) VALUES ('%s', '%s', %s, %s)""" % (new_firstname, new_lastname, new_age, new_room)
+    execute_query(conn, sql_insert)
+    return "New resident data added."
 
 
 
