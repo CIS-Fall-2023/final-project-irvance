@@ -90,10 +90,10 @@ def delete_floors():
 # Room APIs
 @app.route('/api/rooms', methods = ['GET'])
 def return_room():
-    return rooms
+    return jsonify(rooms)
 
 @app.route('/api/rooms/add', methods = ['POST'])
-def add_floor():
+def add_rooms():
     req_data = request.get_json() # json request for postman
     new_capacity = req_data.get('capacity')
     new_number =  req_data.get('number')
@@ -101,14 +101,10 @@ def add_floor():
 
     sql_insert = """INSERT INTO room (capacity, number, floor) VALUES (%s, %s, %s)""" % (new_capacity, new_number, new_floor)
     execute_query(conn, sql_insert)
-    return "New floor added."
+    return "New room added."
 
 
-
-
-
-
-# Resident APIs
+# # Resident APIs
 @app.route('/api/residents', methods = ['GET'])
 def return_resident():
     return residents
