@@ -149,8 +149,31 @@ def add_resident():
     execute_query(conn, sql_insert)
     return "New resident data added."
 
+@app.route('/api/residents/update', methods = ['PUT'])
+def update_resident():
+    if 'id' in request.args:
+        id = int(request.args['id'])
+    else:
+        return "Error. No ID provided."
+    #functionality to update rooms if resident switches rooms
+    req_data = request.get_json() #json body 
+    update_column = req_data.get('room')
+    new_room= "UPDATE resident SET room = '%s' WHERE id = %s" % (update_column, id)
+    execute_query(conn, new_room)
+    return "Resident room updated."
 
-
+@app.route('/api/residents/delete', methods = ['DELETE'])
+def delete_resident():
+    if 'id' in request.args:
+        id = int(request.args['id'])
+    else:
+        return "Error. No ID provided."
+    idToDelete = id
+    for i in range(len(residents)-1, -1, -1):
+        if residents[i]['id'] == idToDelete:
+            delete_query = "DELETE FROM resident WHERE id = %s" % (id)
+            execute_query(conn, delete_query)
+        return "Resident data removed from table."
 
 app.run()
 
