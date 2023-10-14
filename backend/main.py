@@ -94,7 +94,7 @@ def return_room():
 
 @app.route('/api/rooms/add', methods = ['POST'])
 def add_rooms():
-    req_data = request.get_json() # json request for postman
+    req_data = request.get_json() # json body request for postman
     new_capacity = req_data.get('capacity')
     new_number =  req_data.get('number')
     new_floor = req_data.get('floor')
@@ -103,6 +103,21 @@ def add_rooms():
     execute_query(conn, sql_insert)
     return "New room added."
 
+@app.route('/api/rooms/update', methods = ['PUT'])
+def update_rooms():
+    if 'id' in request.args:
+        id = int(request.args['id'])
+    else:
+        return "Error. No ID provided."
+    req_data = request.get_json() #json body 
+    update_column = req_data.get('capacity') # prompts user in postman to update floor name
+    update_capacity = "UPDATE room SET capacity = '%s' WHERE id = %s" % (update_column, id)
+    execute_query(conn, update_capacity)
+    return "Room capacity updated."
+
+# @app.route('/api/rooms/delete', methods = ['DELETE'])
+# def delete_rooms():
+    
 
 # # Resident APIs
 @app.route('/api/residents', methods = ['GET'])
