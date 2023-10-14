@@ -40,7 +40,7 @@ residents = execute_read_query(conn,sql_resident)
 # Welcome page
 @app.route('/home', methods = ['GET'])
 def welcome_page():
-    return '<h1> Home page </h1>'
+    return '<h1> Welcome to our home page! </h1>'
 
 
 # Floor APIs
@@ -64,19 +64,44 @@ def update_floors():
     if 'id' in request.args:
         id = int(request.args['id'])
     else:
-        return "Error. No id provided."
+        return "Error. No ID provided."
     req_data = request.get_json()
     update_column = req_data.get('name') # prompts user in postman to update floor name
     update_name = "UPDATE floor SET name = '%s' WHERE id = %s" % (update_column, id)
     execute_query(conn, update_name)
     return "Floor name updated."
 
+# Deletes entry based on id entered
+@app.route('/api/floors/delete', methods=['DELETE'])
+def delete_floors():
+    if 'id' in request.args:
+        id = int(request.args['id'])
+    else:
+        return "Error. No ID provided."
+    idToDelete = id
+    for i in range(len(floors)-1, -1, -1):
+        if floors[i]['id'] == idToDelete:
+            delete_query = "DELETE FROM floor WHERE id = %s" % (id)
+            execute_query(conn, delete_query)
+        return "Floor data removed from table."
+    
 
-
+# ---------------------------------------------------
 # Room APIs
 @app.route('/api/rooms', methods = ['GET'])
 def return_room():
     return rooms
+
+@app.route('/api/rooms/add', methods = ['POST'])
+def add_floor():
+    req_data = request.get_json() # json request for postman
+    new_capacity = req_data.get('capacity')
+    new_number =  req_data.get('number')
+    new_floor = req_data.get('floor')
+
+    sql_insert = """INSERT INTO room (capacity, number, floor) VALUES (%s, %s, %s)""" % (new_capacity, new_number, new_floor)
+    execute_query(conn, sql_insert)
+    return "New floor added."
 
 
 
