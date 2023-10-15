@@ -1,21 +1,19 @@
 # final project part 1
 import flask
 from flask import jsonify
-from flask import request
+from flask import request, make_response
+import hashlib
 import creds
 from sql import create_connection
 from sql import execute_read_query
 from sql import execute_query
 
-#objective: GET: Return ALL animals from zoo; POST: add new animal to zoo; PUT: update column given an id; DELETE: delete an animal, given an id
 app = flask.Flask(__name__) # sets up application
 app.config["DEBUG"] = True # allows errors to show in browser
 
 myCreds = creds.Creds()
 conn = create_connection(myCreds.host, myCreds.user, myCreds.password, myCreds.database)
 
-# masterUsername = 
-# masterPassword = 
 
 sql_floor= "SELECT * FROM floor"
 floors = execute_read_query(conn,sql_floor)
@@ -26,21 +24,52 @@ rooms = execute_read_query(conn,sql_room)
 sql_resident = "SELECT * FROM resident"
 residents = execute_read_query(conn,sql_resident)
 
-# # token authentication
-# @app.route('/login', methods = ['GET'])
-# def auth_test():
-#     if request.authorization:
-#         encoded = request.authorization.password.encode #unicode encoding
-#         hashedResult = hashlib.sha256(encoded) #hashing
-#         if request.authorization.username == masterUsername and hashedResult.hexdigest() == masterPassword:
-#             return '<h1> Authorized user access </h1>'
-#     return make_response('Could not verify.', 401, {'WWW-Authenticate': 'Basic realm = "Login required."'})
+masterUsername = "username"
+masterPassword = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
 
+
+validTokens = {"100", "200", "300", "400"}
+authorizedUsers = [
+    {
+        'username': 'username',
+        'password': 'password',
+        'token': '12345'
+
+    },
+    {
+        'username': 'admin',
+        'password': 'password',
+        'token': '678910'
+    }
+]
+
+# login and authorization code used from class notes
+@app.route('/api/login', methods = ['POST'])
+def login():
+    req_data = request.get_json()
+    username = req_data.get('username')
+    password = req_data.get('password')
+    
+    for authuser in authorizedUsers:
+        if authuser['username'] == username and authuser['password'] == password:
+            return jsonify('Login successful.')
+    return jsonify("Invalid user credentials."), 401
+
+# using authorization header for postman testing
+@app.route('/authenticatedroute', methods = ['GET'])
+def verify_token():
+    if request.authorization:
+        encoded = request.authorization.password.encode()
+        hashedResult = hashlib.sha256(encoded)
+        if request.authorization.username == masterUsername and hashedResult.hexdigest() == masterPassword:
+            return '<h1> User access authenticated. </h1>'
+    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm = "Login Required"'})
 
 # Welcome page
 @app.route('/home', methods = ['GET'])
 def welcome_page():
-    return '<h1> Welcome to our home page! </h1>'
+    return '<h1> Welcome to Shady Grove\'s home page </h1>'
+
 
 
 # Floor APIs
@@ -83,14 +112,17 @@ def delete_floors():
         if floors[i]['id'] == idToDelete:
             delete_query = "DELETE FROM floor WHERE id = %s" % (id)
             execute_query(conn, delete_query)
-        return "Floor data removed from table."
+            return "Floor data removed from table."
+        else:
+            return "This ID does not exist."
+
     
 
 
 
 # Room APIs
 @app.route('/api/rooms', methods = ['GET'])
-def return_room():
+def return_room(): 
     return jsonify(rooms)
 
 @app.route('/api/rooms/add', methods = ['POST'])
@@ -106,6 +138,7 @@ def add_rooms():
 
 @app.route('/api/rooms/update', methods = ['PUT'])
 def update_rooms():
+    
     if 'id' in request.args:
         id = int(request.args['id'])
     else:
@@ -127,8 +160,9 @@ def delete_rooms():
         if rooms[i]['id'] == idToDelete:
             delete_query = "DELETE FROM room WHERE id = %s" % (id)
             execute_query(conn, delete_query)
-        return "Room data removed from table."
-
+            return "Room data removed from table."
+        else:
+            return "This ID does not exist."
 
 
 
@@ -173,10 +207,15 @@ def delete_resident():
         if residents[i]['id'] == idToDelete:
             delete_query = "DELETE FROM resident WHERE id = %s" % (id)
             execute_query(conn, delete_query)
-        return "Resident data removed from table."
+            return "Resident data removed from table."
+        else:
+            return "This ID does not exist."
 
 app.run()
 
-
 # References
 # https://dev.mysql.com/doc/mysql-tutorial-excerpt/8.0/en/example-foreign-keys.html
+# https://flask-login.readthedocs.io/en/latest/
+# https://flask-httpauth.readthedocs.io/en/latest/
+# https://pythonbasics.org/flask-login/
+# https://stackoverflow.com/questions/65520316/for-a-rest-api-can-i-use-authentication-mechanism-provided-by-flask-login-or-do
