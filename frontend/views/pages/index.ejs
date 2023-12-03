@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+
+    <main>
+        <div>
+            <form action="/process_login" method="post">
+                <div class="form-group">
+                    <label for="exampleInputEmail1" class="form-label">User name</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Username" required
+                    autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password"
+                    required>
+                 </div>
+                <input class="btn btn-lg btn-primary btn-block" type="submit">
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+
+</html>
