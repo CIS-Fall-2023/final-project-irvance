@@ -16,10 +16,9 @@ app.set('view engine', 'ejs');
 // index page 
 app.get('/', function(req, res) {
      res.render("pages/index.ejs", {});
-    //  res.render("pages/alias.ejs", {});
+
 });
 
-//instead of checking if user = admin, a
   app.post('/process_login', function(req, res){
     var user = req.body.username;
     var password = req.body.password;
